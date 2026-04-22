@@ -1,0 +1,80 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: tasks-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  auth1:
+    build:
+      context: ./backend
+    command: uvicorn app.main_auth:app --host 0.0.0.0 --port 8000
+    environment:
+      MONGODB_URI: mongodb+srv://udayakanth2125_db_user:husky2125@cluster0.6lmixuq.mongodb.net/tasks_app?retryWrites=true&w=majority&appName=Cluster0
+      MONGODB_DB: tasks_app
+      JWT_SECRET_KEY: change-me
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 60
+      BACKEND_CORS_ORIGINS: http://localhost:5173,http://localhost:5174
+    depends_on:
+      - mongo
+
+  auth2:
+    build:
+      context: ./backend
+    command: uvicorn app.main_auth:app --host 0.0.0.0 --port 8000
+    environment:
+      MONGODB_URI: mongodb+srv://udayakanth2125_db_user:husky2125@cluster0.6lmixuq.mongodb.net/tasks_app?retryWrites=true&w=majority&appName=Cluster0
+      MONGODB_DB: tasks_app
+      JWT_SECRET_KEY: change-me
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 60
+      BACKEND_CORS_ORIGINS: http://localhost:5173,http://localhost:5174
+    depends_on:
+      - mongo
+
+  tasks1:
+    build:
+      context: ./backend
+    command: uvicorn app.main_tasks:app --host 0.0.0.0 --port 8000
+    environment:
+      MONGODB_URI: mongodb+srv://udayakanth2125_db_user:husky2125@cluster0.6lmixuq.mongodb.net/tasks_app?retryWrites=true&w=majority&appName=Cluster0
+      MONGODB_DB: tasks_app
+      JWT_SECRET_KEY: change-me
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 60
+      BACKEND_CORS_ORIGINS: http://localhost:5173,http://localhost:5174
+    depends_on:
+      - mongo
+
+  tasks2:
+    build:
+      context: ./backend
+    command: uvicorn app.main_tasks:app --host 0.0.0.0 --port 8000
+    environment:
+      MONGODB_URI: mongodb+srv://udayakanth2125_db_user:husky2125@cluster0.6lmixuq.mongodb.net/tasks_app?retryWrites=true&w=majority&appName=Cluster0
+      MONGODB_DB: tasks_app
+      JWT_SECRET_KEY: change-me
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 60
+      BACKEND_CORS_ORIGINS: http://localhost:5173,http://localhost:5174
+    depends_on:
+      - mongo
+
+  gateway:
+    image: nginx:1.27-alpine
+    container_name: tasks-gateway
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - auth1
+      - auth2
+      - tasks1
+      - tasks2
+
+volumes:
+  mongo_data:
